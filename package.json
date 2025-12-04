@@ -18,7 +18,9 @@
   "homepage": "https://github.com/abubekernuru/mern-estate#readme",
   "description": "",
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "mongoose": "^9.0.0",
     "nodemon": "^3.1.11"
   }
 }
