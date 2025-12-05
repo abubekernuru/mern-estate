@@ -12,3 +12,7 @@ mongoose.connect(process.env.MONGO_URI)
 .catch((err)=> {
     console.log(err)
 })
+
+const userRoute = require('./routes/user.route')
+app.use('/api/user', userRoute)
+
