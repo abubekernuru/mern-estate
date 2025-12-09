@@ -4,8 +4,10 @@ require('dotenv').config();
 const app = express();
 const userRoute = require('./routes/user.route');
 const authRoute = require('./routes/auth.route');
+const cookieParser = require('cookie-parser');
 
 app.use(express.json())
+app.use(cookieParser());
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000!")
