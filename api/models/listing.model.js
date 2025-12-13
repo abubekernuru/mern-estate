@@ -50,7 +50,7 @@ const listingSchema = new mongoose.Schema({
         required: true
     },
     useRef:{
-        type: Boolean,
+        type: String,
         required: true
     },
 
