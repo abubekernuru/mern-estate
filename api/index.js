@@ -2,8 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const app = express();
-const userRoute = require('./routes/user.route');
-const authRoute = require('./routes/auth.route');
+const userRoute = require('./routes/user.route.js');
+const authRoute = require('./routes/auth.route.js');
+const listingRoute = require('./routes/listing.route.js');
 const cookieParser = require('cookie-parser');
 
 app.use(express.json())
@@ -21,6 +22,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/listing', listingRoute);
 
 app.use((err, req, res, next)=> {
     const error = new Error();
