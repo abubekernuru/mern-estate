@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux"
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import {
   updateUserStart, updateUserSuccess, updateUserFailure,
   deleteUserStart,
@@ -10,6 +10,7 @@ import {
   signOutUserSuccess
 } from '../redux/user/userSlice.js';
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 
 function Profile() {
   const { currentUser, loading, error } = useSelector((state)=>state.user);
@@ -49,7 +50,7 @@ function Profile() {
         ...prevFormData, 
          avatar: data.secure_url,
       }));
-      console.log("Uploaded:", data.secure_url);
+      console.log("Uploaded:", imageUrl);
     }
   };
 
@@ -118,7 +119,6 @@ const handleSubmit = async (e) => {
       <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
         <input type="file" hidden ref={fileRef} onChange={(e)=>handleImageUpload(e.target.files[0])}/>
         <img onClick={()=>fileRef.current.click()} src={formData.avatar || currentUser.avatar} alt="profile" className='rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2' />
-
         {/* Uploading feedback */}
         {uploading && (
         <p className="text-center text-slate-600 text-sm">
@@ -154,6 +154,12 @@ const handleSubmit = async (e) => {
         >
           {loading ? 'Loading...' : 'Update'}
         </button>
+        <Link
+          className='bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95'
+          to={'/create-listing'}
+        >
+          Create Listing
+        </Link>
       </form>
       <div className='flex justify-between mt-5'>
         <span
