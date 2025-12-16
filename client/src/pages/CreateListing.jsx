@@ -1,7 +1,73 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 function CreateListing() {
-    return (
+    const [files, setFiles] = useState([]);
+    const [formData, setFormData] = useState({
+        imageUrls: [],
+        name: '',
+        description: '',
+        address: '',
+        type: 'rent',
+        bedrooms: 1,
+        bathrooms: 1,
+        regularPrice: 50,
+        discountPrice: 0,
+        offer: false,
+        parking: false,
+        furnished: false,
+    })
+    const [uploading, setUploading] = useState(false);
+    // console.log(files)
+    const [imageUploadError, setImageUploadError] = useState(false);
+    const handleImageSubmit = ()=> {
+        setUploading(true)
+            if(files.length > 0 && files.length < 7){
+            const promises =[];
+            for (let i = 0; i < files.length; i++) {
+                promises.push(storeImage(files[i]));
+            }
+            Promise.all(promises)
+            .then((urls) => {
+                setFormData({
+                    ...formData,
+                    imageUrls: formData.imageUrls.concat(urls)
+                })
+                setImageUploadError(false);
+                setUploading(false);
+            })
+            .catch((err)=>{
+                setImageUploadError('Image upload failed (2 mb max per image)');
+                setUploading(false);
+                console.log(err)
+            })
+    }else {
+        setImageUploadError('You can only upload 6 images per listing')
+        setUploading(false)
+    }
+    }
+            
+    const storeImage = async (file)=> {
+            try {
+                // CLOUDINARY INFO
+                const cloudName = "dv8q3oyfj";
+                const uploadPreset = "listing_preset";
+                const fData = new FormData();
+                fData.append('file', file);
+                fData.append("upload_preset", uploadPreset);
+                const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+                const res =  await fetch(url, {
+                    method: 'POST',
+                    body: fData
+                })
+                const data = await res.json();
+                console.log(data.secure_url)
+                return data.secure_url;
+            } catch (error) {
+                console.log(error)
+            }
+        
+    }
+return (
     <main className='p-3 max-w-4xl mx-auto'>
         <h1 className='text-3xl font-semibold text-center my-7'>Create a Listing</h1>
         <form className='flex flex-col sm:flex-row gap-4'>
@@ -119,22 +185,50 @@ function CreateListing() {
                 id='images'
                 accept='image/*'
                 multiple
+                onChange={(e)=>setFiles(e.target.files)}
             />
             <button
                 type='button'
+                disabled={uploading} 
+                onClick={handleImageSubmit}
                 className='p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80'
             >
-                Upload
+                {uploading ? 'Uploading...' : 'Upload'}
             </button>
             </div>
+            <p className='text-red-700 text-sm'>
+            {imageUploadError && imageUploadError}
+          </p>
+          {formData.imageUrls.length > 0 &&
+            formData.imageUrls.map((url, index) => (
+              <div
+                key={url}
+                className='flex justify-between p-3 border items-center'
+              >
+                <img
+                  src={url}
+                  alt='listing image'
+                  className='w-20 h-20 object-contain rounded-lg'
+                />
+                <button
+                  type='button'
+                  className='p-3 text-red-700 rounded-lg uppercase hover:opacity-75'
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
             <p className='text-red-700 text-sm'></p>
-            <button className='p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>
+            <button 
+                disabled={uploading}
+                className='p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
+            >
                 Create listing
             </button>
         </div>
         </form>
     </main>
-  )
+    )
 }
 
 export default CreateListing
