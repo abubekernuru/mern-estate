@@ -72,6 +72,12 @@ function CreateListing() {
             }
         
     }
+    const handleDeleteImage = (index)=> {
+        setFormData({
+            ...formData,
+            imageUrls: formData.imageUrls.filter((_, i)=> i !== index),
+        })
+    }
     const handleChange = (e)=> {
         if(e.target.id === 'rent' || e.target.id === 'sale'){
             setFormData({
@@ -300,6 +306,7 @@ return (
                     className='w-20 h-20 object-contain rounded-lg'
                 />
                 <button
+                    onClick={() => handleDeleteImage(index)}
                     type='button'
                     className='p-3 text-red-700 rounded-lg uppercase hover:opacity-75'
                 >
