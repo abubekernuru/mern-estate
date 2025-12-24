@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { Navigation } from 'swiper/modules';
-import { useSelector } from 'react-redux'; 
-// import Contact from '../components/Contact'; 
+import { useSelector } from 'react-redux';
+import Contact from '../components/Contact'; 
 import 'swiper/css/bundle';
 import {
   FaBath,
@@ -131,8 +131,7 @@ function Listing() {
                 {listing.furnished ? 'Furnished' : 'Unfurnished'}
               </li>
             </ul>
-
-            {/* Contact section  */}
+            
             {currentUser && listing.userRef !== currentUser._id && !contact && (
               <button
                 onClick={() => setContact(true)}
@@ -141,7 +140,7 @@ function Listing() {
                 Contact landlord
               </button>
             )}
-            {/* {contact && <Contact listing={listing} />} */}
+            {contact && <Contact listing={listing} />}
           </div>
         </div>
       )}
