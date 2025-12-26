@@ -48,7 +48,7 @@ const updateListing = async (req, res, next)=>{
     next(error)
   }
 }
-
+// Search API
 const getListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id);
