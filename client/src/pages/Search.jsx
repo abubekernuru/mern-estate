@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import ListingItem from '../components/ListingItem';
 
 function Search() {
 
@@ -47,12 +48,17 @@ function Search() {
       })
     }
     const fetchListings = async () => {
-      setLoading(true);
-      const searchQuery = urlParams.toString();
-      const res = await fetch(`/api/listing/get?${searchQuery}`);
-      const data = await res.json();
-      console.log(data)
-      setListings(data)
+      try {
+        setLoading(true);
+        const searchQuery = urlParams.toString();
+        const res = await fetch(`/api/listing/get?${searchQuery}`);
+        const data = await res.json();
+        setLoading(false);
+        setListings(data)
+        
+      } catch (error) {
+        console.log(error)
+      }
     }
     fetchListings();
   },[location.search])
@@ -196,7 +202,17 @@ function Search() {
         <h1 className='text-3xl font-semibold border-b p-3 text-slate-700 mt-5'>
             Listing results:
         </h1>
-        {/* <div className='p-7 flex flex-wrap gap-4'></div> */}
+        <div className='p-7 flex flex-wrap gap-4'>
+          {!loading && listings.length === 0 && (
+            <p className='text-xl'>No listings found</p>
+          )}
+          {loading && (
+            <p className='text-center'>Loading...</p>
+          )}
+          {!loading && listings && listings.map((listing)=> (
+            <ListingItem key={listing._id} listing={listing}/>
+          ))}
+        </div>
     </div>
     </div>
   )
