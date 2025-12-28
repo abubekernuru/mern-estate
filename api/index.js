@@ -8,39 +8,46 @@ const listingRoute = require('./routes/listing.route.js');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
-
-app.use(express.json())
+app.use(express.json());
 app.use(cookieParser());
 
-app.listen(3000, () => {
-    console.log("Server is running on port 3000!")
-})
-
-const __dirname = path.resolve();
 
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("Connected to MongoDb!"))
-.catch((err)=> {
-    console.log(err)
-})
+  .then(() => console.log("Connected to MongoDb!"))
+  .catch((err) => {
+    console.log(err);
+  });
 
+// Routes
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/listing', listingRoute);
 
-app.use(express.static(path.join(__dirname, '/client/dist')));
+// Serve static files
+const __dirname = path.resolve();
 
-app.get('*', (req, res) => { {
+// Only serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '/client/dist')));
+  
+  app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '/client/dist/index.html'));
-}});
+  });
+}
 
-app.use((err, req, res, next)=> {
-    const error = new Error();
-    const statusCode = err.statusCode || 500;
-    const message = err.message || "Internal serval error!";
-    return res.status(statusCode).json({
-        success: false,
-        statusCode,
-        message
-    })
-})
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal server error!";
+  return res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message
+  });
+});
+
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}!`);
+});
