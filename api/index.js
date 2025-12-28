@@ -6,6 +6,8 @@ const userRoute = require('./routes/user.route.js');
 const authRoute = require('./routes/auth.route.js');
 const listingRoute = require('./routes/listing.route.js');
 const cookieParser = require('cookie-parser');
+const path = require('path');
+
 
 app.use(express.json())
 app.use(cookieParser());
@@ -13,6 +15,8 @@ app.use(cookieParser());
 app.listen(3000, () => {
     console.log("Server is running on port 3000!")
 })
+
+const __dirname = path.resolve();
 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("Connected to MongoDb!"))
@@ -23,6 +27,12 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/listing', listingRoute);
+
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+app.get('*', (req, res) => { {
+    res.sendFile(path.join(__dirname, '/client/dist/index.html'));
+}});
 
 app.use((err, req, res, next)=> {
     const error = new Error();
