@@ -71,9 +71,9 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Import routes
-const userRoute = require('./api/routes/user.route.js');
-const authRoute = require('./api/routes/auth.route.js');
-const listingRoute = require('./api/routes/listing.route.js');
+const userRoute = require('./routes/user.route.js');
+const authRoute = require('./routes/auth.route.js');
+const listingRoute = require('./routes/listing.route.js');
 
 // API routes
 app.use('/api/user', userRoute);
