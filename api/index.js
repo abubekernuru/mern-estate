@@ -52,7 +52,6 @@
 //   console.log(`Server is running on port ${PORT}!`);
 // });
 
-// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -80,45 +79,47 @@ app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/listing', listingRoute);
 
-// Serve static files from client/dist
-const clientDistPath = path.join(__dirname, 'client', 'dist');
+// IMPORTANT: Get the correct path to client/dist
+// process.cwd() returns the root project directory
+const rootDir = process.cwd();
+const clientDistPath = path.join(rootDir, 'client', 'dist');
 
-// Check if production and client/dist exists
-const isProduction = process.env.NODE_ENV === 'production';
-const clientDistExists = fs.existsSync(clientDistPath);
-
-console.log('Production mode:', isProduction);
+console.log('Root directory:', rootDir);
 console.log('Client dist path:', clientDistPath);
-console.log('Client dist exists:', clientDistExists);
 
-if (isProduction && clientDistExists) {
-  console.log('Serving static files from:', clientDistPath);
+// Check if client/dist exists
+if (fs.existsSync(clientDistPath)) {
+  console.log('✅ Client dist folder FOUND!');
+  console.log('Files in client/dist:', fs.readdirSync(clientDistPath));
+  
+  // Serve static files
   app.use(express.static(clientDistPath));
   
-  // Handle SPA routing - serve index.html for all non-API routes
-  app.get('*', (req, res, next) => {
+  // Handle SPA routing
+  app.get(/.*/, (req, res, next) => {
     if (!req.path.startsWith('/api/')) {
-      const indexPath = path.join(clientDistPath, 'index.html');
-      console.log('Serving index.html from:', indexPath);
-      res.sendFile(indexPath);
+      res.sendFile(path.join(clientDistPath, 'index.html'));
     } else {
       next();
     }
   });
-} else if (isProduction) {
-  console.warn('WARNING: Production mode but client/dist folder not found!');
-  console.log('Current directory:', __dirname);
-  console.log('Directory contents:', fs.readdirSync(__dirname));
+} else {
+  console.log('❌ Client dist folder NOT found!');
+  console.log('Current directory contents:', fs.readdirSync(rootDir));
   
-  // Fallback for production
+  // Fallback response
   app.get('/', (req, res) => {
     res.send(`
       <html>
-        <body>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
           <h1>Server is running ✅</h1>
-          <p>But React build files are missing.</p>
-          <p>Check if build completed successfully.</p>
-          <p>Client dist path expected at: ${clientDistPath}</p>
+          <p><strong>But React build files are missing.</strong></p>
+          <p>Expected at: ${clientDistPath}</p>
+          <p>Root directory: ${rootDir}</p>
+          <p>Current files in root:</p>
+          <ul>
+            ${fs.readdirSync(rootDir).map(file => `<li>${file}</li>`).join('')}
+          </ul>
         </body>
       </html>
     `);
@@ -141,5 +142,4 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}!`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
