@@ -24,7 +24,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/listing', listingRoute);
 
 // Serve static files
-const __dirname = path.resolve();
+__dirname = path.resolve();
 
 // Only serve static files in production
 if (process.env.NODE_ENV === 'production') {
