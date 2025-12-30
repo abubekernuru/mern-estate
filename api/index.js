@@ -7,16 +7,19 @@ const authRoute = require('./routes/auth.route.js');
 const listingRoute = require('./routes/listing.route.js');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const serverless = require('serverless-http');
 
 app.use(express.json());
 app.use(cookieParser());
 
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("Connected to MongoDb!"))
-  .catch((err) => {
-    console.log(err);
-  });
+if (mongoose.connection.readyState === 0) {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("Connected to MongoDb!"))
+    .catch((err) => {
+      console.log(err);
+    });
+}
 
 // Routes
 app.use('/api/user', userRoute);
@@ -46,11 +49,15 @@ app.use((err, req, res, next) => {
 });
 
 
-const PORT = process.env.PORT || 3000;
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}!`);
-});
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}!`);
+  });
+}
+
+module.exports = serverless(app);
 
 
 
