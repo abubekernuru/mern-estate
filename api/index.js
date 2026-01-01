@@ -8,6 +8,17 @@ const listingRoute = require('./routes/listing.route.js');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const serverless = require('serverless-http');
+// const cors = require('cors');
+
+// // Middleware
+// app.use(
+//   cors({
+//     origin: '*',
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true,
+//   })
+// );
 
 app.use(express.json());
 app.use(cookieParser());
