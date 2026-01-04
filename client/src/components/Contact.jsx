@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
+import { apiUrl } from '../config';
 
 function Contact({listing}) {
     const [landlord, setLandLord] = useState(null);
@@ -8,7 +9,7 @@ function Contact({listing}) {
     useEffect(()=>{
         const fetchLandLord = async ()=>{
             try {
-                const res = await fetch(`/api/user/${listing.userRef}`);
+                const res = await fetch(apiUrl(`/api/user/${listing.userRef}`));
                 const data = await res.json();
                 setLandLord(data)
             } catch (error) {

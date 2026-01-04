@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../config';
 function CreateListing() {
     const { currentUser } = useSelector((state) => state.user);
     const navigate = useNavigate();
@@ -111,7 +112,7 @@ function CreateListing() {
             return setError('Discount price must be lower than regular price');
             setLoading(true);
             setError(false);
-            const res = await fetch('/api/listing/create', {
+            const res = await fetch(apiUrl('/api/listing/create'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
