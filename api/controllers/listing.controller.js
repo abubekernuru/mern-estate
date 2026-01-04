@@ -4,9 +4,33 @@ const { errorHandler } = require('../utils/error.js');
 
 const createListing = async (req, res, next) => {
   try {
-    const listing = await Listing.create(req.body);
+    // Ensure the user is authenticated (token -> req.user set by verifyToken)
+    if (!req.user || !req.user.id) {
+      // Helpful debug logging to inspect why user was missing
+      console.warn('[createListing] unauthenticated request. cookies:', req.cookies, 'body:', req.body);
+      return next(errorHandler(401, 'Unauthorized - sign in to create listings'));
+    }
+
+    const payload = { ...req.body };
+
+    // Remove any client-supplied id
+    if (payload._id) delete payload._id;
+
+    // Set the authenticated user as the owner
+    payload.userRef = String(req.user.id);
+
+    // Basic validation for required fields
+    if (!payload.name || !payload.imageUrls || !Array.isArray(payload.imageUrls) || payload.imageUrls.length < 1) {
+      return next(errorHandler(400, 'Missing required listing fields (name, imageUrls)'));
+    }
+
+    const listing = await Listing.create(payload);
     return res.status(201).json(listing);
   } catch (error) {
+    // If this is a Mongoose validation error, return a 400 with details
+    if (error.name === 'ValidationError') {
+      return next(errorHandler(400, `Listing validation failed: ${Object.values(error.errors).map(e => e.message).join(', ')}`));
+    }
     next(error);
   }
 };
