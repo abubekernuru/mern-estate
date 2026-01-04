@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom';
+import { apiUrl } from '../config';
 function UpdateListing() {
     const { currentUser } = useSelector((state) => state.user);
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ function UpdateListing() {
     useEffect(()=>{
         const listingId = params.listingId;
         const fetchListing = async ()=>{
-            const res = await fetch(`/api/listing/get/${listingId}`);
+            const res = await fetch(apiUrl(`/api/listing/get/${listingId}`));
             const data = await res.json();
             if(data.success === false){
                 console.log(data.message)
@@ -127,7 +128,7 @@ function UpdateListing() {
             return setError('Discount price must be lower than regular price');
             setLoading(true);
             setError(false);
-            const res = await fetch(`/api/listing/update/${params.listingId}`, {
+            const res = await fetch(apiUrl(`/api/listing/update/${params.listingId}`), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

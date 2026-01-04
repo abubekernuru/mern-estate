@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'; 
 import { useParams } from 'react-router-dom';
+import { apiUrl } from '../config';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { Navigation } from 'swiper/modules';
@@ -30,7 +31,7 @@ function Listing() {
     const fetchListing = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/listing/get/${params.listingId}`);
+        const res = await fetch(apiUrl(`/api/listing/get/${params.listingId}`));
         const data = await res.json();
         if (data.success === false) {
           setError(data.message); 
