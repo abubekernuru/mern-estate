@@ -114,17 +114,26 @@ function CreateListing() {
             setError(false);
             const res = await fetch(apiUrl('/api/listing/create'), {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body:   JSON.stringify({
                     ...formData,
-                    userRef: currentUser._id
+                    // userRef will be set on server from token
                 })
             })
+            // If unauthorized, inform user
+            if (res.status === 401) {
+                setLoading(false);
+                setError('You must sign in to create a listing');
+                return;
+            }
             const data = await res.json();
-            if(data.sucess === false){
-                setError(data.message);
+            if(data.success === false || !data._id){
+                setError(data.message || 'Failed to create listing');
+                setLoading(false);
+                return;
             }
             setLoading(false);
             setError(false);

@@ -69,6 +69,7 @@ const handleSubmit = async (e) => {
       dispatch(updateUserStart());
       const res = await fetch(apiUrl(`/api/user/update/${currentUser._id}`), {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -91,6 +92,7 @@ const handleSubmit = async (e) => {
       dispatch(deleteUserStart());
       const res = await fetch(apiUrl(`/api/user/delete/${currentUser._id}`), {
         method: 'DELETE',
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success === false) {
@@ -105,7 +107,7 @@ const handleSubmit = async (e) => {
   const handleSignOut = async()=> {
     try {
       dispatch(signOutUserStart())
-      const res = await fetch(apiUrl('/api/auth/signout'));
+      const res = await fetch(apiUrl('/api/auth/signout'), { credentials: 'include' });
       const data = await res.json();
       if (data.success === false) {
         dispatch(signOutUserFailure(data.message));
@@ -119,7 +121,7 @@ const handleSubmit = async (e) => {
    const handleShowListings = async () => {
     try {
       setShowListingsError(false);
-      const res = await fetch(apiUrl(`/api/user/listings/${currentUser._id}`));
+      const res = await fetch(apiUrl(`/api/user/listings/${currentUser._id}`), { credentials: 'include' });
       const data = await res.json();
       if (data.success === false) {
         setShowListingsError(true);
@@ -135,6 +137,7 @@ const handleSubmit = async (e) => {
     try {
       const res = await fetch(apiUrl(`/api/listing/delete/${listingId}`), {
         method: 'DELETE',
+        credentials: 'include',
       });
       const data = await res.json();
       setUserListings(userListings.filter((listing)=>listing._id !== listingId));

@@ -130,12 +130,12 @@ function UpdateListing() {
             setError(false);
             const res = await fetch(apiUrl(`/api/listing/update/${params.listingId}`), {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body:   JSON.stringify({
                     ...formData,
-                    userRef: currentUser._id
                 })
             })
             const data = await res.json();
