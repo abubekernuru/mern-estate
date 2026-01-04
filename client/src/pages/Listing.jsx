@@ -30,6 +30,12 @@ function Listing() {
   useEffect(() => {
     const fetchListing = async () => {
       try {
+        // Guard against invalid ids (eg. "undefined") coming from incorrect navigation
+        if (!params.listingId || params.listingId === 'undefined') {
+          setError('Invalid listing id');
+          return;
+        }
+
         setLoading(true);
         const res = await fetch(apiUrl(`/api/listing/get/${params.listingId}`));
         const data = await res.json();
