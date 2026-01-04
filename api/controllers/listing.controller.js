@@ -1,32 +1,20 @@
 const Listing = require('../models/listing.model.js');
+const mongoose = require('mongoose');
 const { errorHandler } = require('../utils/error.js');
 
 const createListing = async (req, res, next) => {
   try {
-    // Don't trust client for user or id fields — use token data
-    const payload = { ...req.body };
-
-    // Remove any _id that may have been accidentally supplied (causes ObjectId cast errors)
-    if (payload._id) delete payload._id;
-
-    // Ensure the listing belongs to the authenticated user (from verifyToken)
-    if (req.user && req.user.id) {
-      payload.userRef = req.user.id;
-    }
-
-    // Basic validation for required fields
-    if (!payload.name || !payload.imageUrls || !Array.isArray(payload.imageUrls) || payload.imageUrls.length < 1) {
-      return next(errorHandler(400, 'Missing required listing fields (name, imageUrls)'));
-    }
-
-    const listing = await Listing.create(payload);
+    const listing = await Listing.create(req.body);
     return res.status(201).json(listing);
   } catch (error) {
     next(error);
   }
 };
 
-const deleteListing = async (req, res, next)=> {
+const deleteListing = async (req, res, next)=> {  // Validate id to avoid Mongoose CastError
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return next(errorHandler(400, 'Invalid listing id'));
+  }
   const listing = await Listing.findById(req.params.id);
 
   if(!listing){
@@ -44,6 +32,11 @@ const deleteListing = async (req, res, next)=> {
 }
 
 const updateListing = async (req, res, next)=>{
+  // Validate id first
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return next(errorHandler(400, 'Invalid listing id'));
+  }
+
   const listing = await Listing.findById(req.params.id);
 
   if(!listing){
@@ -67,6 +60,11 @@ const updateListing = async (req, res, next)=>{
 // Search API
 const getListing = async (req, res, next) => {
   try {
+    // Validate id to avoid CastError
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(errorHandler(400, 'Invalid listing id'));
+    }
+
     const listing = await Listing.findById(req.params.id);
     if (!listing) {
       return next(errorHandler(404, 'Listing not found!'));
