@@ -3,7 +3,23 @@ const { errorHandler } = require('../utils/error.js');
 
 const createListing = async (req, res, next) => {
   try {
-    const listing = await Listing.create(req.body);
+    // Don't trust client for user or id fields — use token data
+    const payload = { ...req.body };
+
+    // Remove any _id that may have been accidentally supplied (causes ObjectId cast errors)
+    if (payload._id) delete payload._id;
+
+    // Ensure the listing belongs to the authenticated user (from verifyToken)
+    if (req.user && req.user.id) {
+      payload.userRef = req.user.id;
+    }
+
+    // Basic validation for required fields
+    if (!payload.name || !payload.imageUrls || !Array.isArray(payload.imageUrls) || payload.imageUrls.length < 1) {
+      return next(errorHandler(400, 'Missing required listing fields (name, imageUrls)'));
+    }
+
+    const listing = await Listing.create(payload);
     return res.status(201).json(listing);
   } catch (error) {
     next(error);
@@ -16,7 +32,7 @@ const deleteListing = async (req, res, next)=> {
   if(!listing){
     return next((errorHandler(404, "Listing not found!")));
   }
-  if(req.user.id !== listing.userRef){
+  if(String(req.user.id) !== String(listing.userRef)){
     return next(errorHandler(401, "You can delete only your own listings!"));
   }
   try {
@@ -33,7 +49,7 @@ const updateListing = async (req, res, next)=>{
   if(!listing){
     return next((errorHandler(404, "Listing not found!")));
   }
-  if(req.user.id !== listing.userRef){
+  if(String(req.user.id) !== String(listing.userRef)){
     return next(errorHandler(401, "You can update only your own listings!"));
   }
 
